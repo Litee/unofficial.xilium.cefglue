@@ -170,6 +170,23 @@ class CefApp : public virtual CefBase {
   virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() {
     return NULL;
   }
+
+  ///
+  // Unwrap command line.
+  ///
+  /*--cef()--*/
+  virtual void UnwrapCommandLine(
+      CefRefPtr<CefCommandLine> command_line) {
+  }
+
+  ///
+  // Wrap command line.
+  ///
+  /*--cef()--*/
+  virtual void WrapCommandLine(
+      CefRefPtr<CefCommandLine> command_line) {
+  }
+
 };
 
 #endif  // CEF_INCLUDE_CEF_APP_H_

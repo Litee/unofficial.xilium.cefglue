@@ -115,5 +115,43 @@
         {
             return null;
         }
+
+
+        private void unwrap_command_line(cef_app_t* self, cef_command_line_t* command_line)
+        {
+            CheckSelf(self);
+
+            var m_commandLine = CefCommandLine.FromNative(command_line);
+
+            UnwrapCommandLine(m_commandLine);
+
+            m_commandLine.Dispose();
+        }
+
+        /// <summary>
+        /// Unwrap command line.
+        /// </summary>
+        protected virtual void UnwrapCommandLine(CefCommandLine commandLine)
+        {
+        }
+
+
+        private void wrap_command_line(cef_app_t* self, cef_command_line_t* command_line)
+        {
+            CheckSelf(self);
+
+            var m_commandLine = CefCommandLine.FromNative(command_line);
+
+            WrapCommandLine(m_commandLine);
+
+            m_commandLine.Dispose();
+        }
+
+        /// <summary>
+        /// Wrap command line.
+        /// </summary>
+        protected virtual void WrapCommandLine(CefCommandLine commandLine)
+        {
+        }
     }
 }

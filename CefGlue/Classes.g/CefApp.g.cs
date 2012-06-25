@@ -27,6 +27,8 @@ namespace Xilium.CefGlue
         private cef_app_t.get_resource_bundle_handler_delegate _ds5;
         private cef_app_t.get_browser_process_handler_delegate _ds6;
         private cef_app_t.get_render_process_handler_delegate _ds7;
+        private cef_app_t.unwrap_command_line_delegate _ds8;
+        private cef_app_t.wrap_command_line_delegate _ds9;
         
         protected CefApp()
         {
@@ -48,6 +50,10 @@ namespace Xilium.CefGlue
             _self->_get_browser_process_handler = Marshal.GetFunctionPointerForDelegate(_ds6);
             _ds7 = new cef_app_t.get_render_process_handler_delegate(get_render_process_handler);
             _self->_get_render_process_handler = Marshal.GetFunctionPointerForDelegate(_ds7);
+            _ds8 = new cef_app_t.unwrap_command_line_delegate(unwrap_command_line);
+            _self->_unwrap_command_line = Marshal.GetFunctionPointerForDelegate(_ds8);
+            _ds9 = new cef_app_t.wrap_command_line_delegate(wrap_command_line);
+            _self->_wrap_command_line = Marshal.GetFunctionPointerForDelegate(_ds9);
         }
         
         ~CefApp()

@@ -11,6 +11,8 @@
         [STAThread]
         private static int Main(string[] args)
         {
+            DemoApp.logger.Write("Main: {0}", string.Join(" ", args));
+
             try
             {
                 CefRuntime.Load();

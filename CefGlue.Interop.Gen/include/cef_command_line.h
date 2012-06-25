@@ -189,6 +189,12 @@ class CefCommandLine : public virtual CefBase {
   ///
   /*--cef()--*/
   virtual void AppendArgument(const CefString& argument) =0;
+
+  ///
+  // Prepend wrapper.
+  ///
+  /*--cef()--*/
+  virtual void PrependWrapper(const CefString& wrapper) =0;
 };
 
 #endif  // CEF_INCLUDE_CEF_COMMAND_LINE_H_
