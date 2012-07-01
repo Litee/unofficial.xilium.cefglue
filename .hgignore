@@ -6,6 +6,8 @@ obj
 # visual studio
 *.user
 *.suo
+*.userprefs
+*.pidb
 
 # python
 *.pyc

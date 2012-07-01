@@ -7,24 +7,43 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CefGlue.Client", "CefGlue.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CefGlue.WindowsForms", "CefGlue.WindowsForms\CefGlue.WindowsForms.csproj", "{679AF14D-8FF5-4608-BFF8-EC1A7DED04A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CefGlue.Demo.GtkSharp", "CefGlue.Demo.GtkSharp\CefGlue.Demo.GtkSharp.csproj", "{1EBB20A3-CEBE-4D18-827F-AAC478839FAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1EBB20A3-CEBE-4D18-827F-AAC478839FAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EBB20A3-CEBE-4D18-827F-AAC478839FAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EBB20A3-CEBE-4D18-827F-AAC478839FAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EBB20A3-CEBE-4D18-827F-AAC478839FAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{311984DF-EB92-4B01-B4AD-C7E73A13E271}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{311984DF-EB92-4B01-B4AD-C7E73A13E271}.Release|Any CPU.ActiveCfg = Release|x86
+		{679AF14D-8FF5-4608-BFF8-EC1A7DED04A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{679AF14D-8FF5-4608-BFF8-EC1A7DED04A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{703FF300-34B9-48D4-A5D6-E741F48D5F95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{703FF300-34B9-48D4-A5D6-E741F48D5F95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{703FF300-34B9-48D4-A5D6-E741F48D5F95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{703FF300-34B9-48D4-A5D6-E741F48D5F95}.Release|Any CPU.Build.0 = Release|Any CPU
-		{311984DF-EB92-4B01-B4AD-C7E73A13E271}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{311984DF-EB92-4B01-B4AD-C7E73A13E271}.Debug|Any CPU.Build.0 = Debug|x86
-		{311984DF-EB92-4B01-B4AD-C7E73A13E271}.Release|Any CPU.ActiveCfg = Release|x86
-		{311984DF-EB92-4B01-B4AD-C7E73A13E271}.Release|Any CPU.Build.0 = Release|x86
-		{679AF14D-8FF5-4608-BFF8-EC1A7DED04A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{679AF14D-8FF5-4608-BFF8-EC1A7DED04A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{679AF14D-8FF5-4608-BFF8-EC1A7DED04A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{679AF14D-8FF5-4608-BFF8-EC1A7DED04A4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = CefGlue.Demo.GtkSharp\CefGlue.Demo.GtkSharp.csproj
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.inheritsSet = null
+		$1.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $2
+		$2.inheritsSet = Mono
+		$2.inheritsScope = text/x-csharp
+		$2.scope = text/x-csharp
+		$0.TextStylePolicy = $3
+		$3.FileWidth = 120
+		$3.RemoveTrailingWhitespace = True
+		$3.inheritsSet = VisualStudio
+		$3.inheritsScope = text/plain
+		$3.scope = text/plain
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

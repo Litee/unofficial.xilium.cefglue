@@ -253,5 +253,20 @@
                 cef_command_line_t.append_argument(_self, &n_value);
             }
         }
+
+        /// <summary>
+        /// Prepend wrapper.
+        /// </summary>
+        public void PrependWrapper(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return;
+
+            fixed (char* value_str = value)
+            {
+                var n_value = new cef_string_t(value_str, value.Length);
+
+                cef_command_line_t.prepend_wrapper(_self, &n_value);
+            }
+        }
     }
 }
