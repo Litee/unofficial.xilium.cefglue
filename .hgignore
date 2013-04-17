@@ -1,0 +1,17 @@
+syntax: glob
+# project's output
+bin
+obj
+
+# visual studio
+*.user
+*.suo
+
+# monodevelop
+*.userprefs
+
+# python
+*.pyc
+
+relre:^CefGlue.Interop.Gen/Classes.Handlers.tmpl/
+relre:^CefGlue.Interop.Gen/Classes.Proxies.tmpl/
