@@ -198,6 +198,7 @@
             ptr->multi_threaded_message_loop = MultiThreadedMessageLoop;
             ptr->command_line_args_disabled = CommandLineArgsDisabled;
             cef_string_t.Copy(CachePath, &ptr->cache_path);
+            ptr->persist_session_cookies = PersistSessionCookies;
             cef_string_t.Copy(UserAgent, &ptr->user_agent);
             cef_string_t.Copy(ProductVersion, &ptr->product_version);
             cef_string_t.Copy(Locale, &ptr->locale);
