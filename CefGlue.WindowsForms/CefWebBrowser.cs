@@ -8,7 +8,7 @@
     using System.Windows.Forms;
 
     [ToolboxBitmap(typeof(CefWebBrowser))]
-    public sealed class CefWebBrowser : Control
+    public class CefWebBrowser : Control
     {
         private bool _handleCreated;
 
@@ -48,6 +48,17 @@
         [DefaultValue("about:blank")]
         public string StartUrl { get; set; }
 
+        [Browsable(false)]
+        public CefBrowserSettings BrowserSettings { get; set; }
+
+		internal void InvokeIfRequired(Action a)
+		{
+			if (InvokeRequired)
+				Invoke(a);
+			else
+				a();
+		}
+
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
@@ -63,10 +74,8 @@
 
                 var client = new CefWebClient(this);
 
-                var settings = new CefBrowserSettings
-                {
-                    // AuthorAndUserStylesDisabled = false,
-                };
+                var settings = BrowserSettings;
+                if (settings == null) settings = new CefBrowserSettings { };
 
                 CefBrowserHost.CreateBrowser(windowInfo, client, settings, StartUrl);
             }
@@ -76,7 +85,7 @@
 
         protected override void Dispose(bool disposing)
         {
-            if (_browser != null)
+            if (_browser != null && disposing) // TODO: ugly hack to avoid crashes when CefWebBrowser are Finalized and underlying objects already finalized
             {
                 var host = _browser.GetHost();
                 host.CloseBrowser();
@@ -90,41 +99,46 @@
             base.Dispose(disposing);
         }
 
-        internal void BrowserAfterCreated(CefBrowser browser)
+    	public event EventHandler BrowserCreated;
+
+        internal protected virtual void OnBrowserAfterCreated(CefBrowser browser)
         {
             _browser = browser;
             _browserWindowHandle = _browser.GetHost().GetWindowHandle();
             ResizeWindow(_browserWindowHandle, Width, Height);
+
+			if (BrowserCreated != null)
+				BrowserCreated(this, EventArgs.Empty);
         }
 
-        internal void OnTitleChanged(string title)
+		internal protected virtual void OnTitleChanged(TitleChangedEventArgs e)
         {
-            Title = title;
+            Title = e.Title;
 
             var handler = TitleChanged;
-            if (handler != null) handler(this, EventArgs.Empty);
+            if (handler != null) handler(this, e);
         }
 
         public string Title { get; private set; }
 
-        public event EventHandler TitleChanged;
+        public event EventHandler<TitleChangedEventArgs> TitleChanged;
 
-        internal void OnAddressChanged(string address)
+        internal protected virtual void OnAddressChanged(AddressChangedEventArgs e)
         {
-            Address = address;
+        	Address = e.Address;
 
             var handler = AddressChanged;
-            if (handler != null) handler(this, EventArgs.Empty);
+            if (handler != null) handler(this, e);
         }
 
         public string Address { get; private set; }
 
-        public event EventHandler AddressChanged;
+        public event EventHandler<AddressChangedEventArgs> AddressChanged;
 
-        internal void OnStatusMessage(string value)
+		internal protected virtual void OnStatusMessage(StatusMessageEventArgs e)
         {
-            var handler = StatusMessage;
-            if (handler != null) handler(this, new StatusMessageEventArgs(value));
+			var handler = StatusMessage;
+            if (handler != null) handler(this, e);
         }
 
         public event EventHandler<StatusMessageEventArgs> StatusMessage;
@@ -133,9 +147,15 @@
         {
             base.OnResize(e);
 
-            var form = TopLevelControl as Form;
-            if (form != null && form.WindowState != FormWindowState.Minimized)
+            if (_browserWindowHandle != IntPtr.Zero)
             {
+                // Ignore size changes when form are minimized.
+                var form = TopLevelControl as Form;
+                if (form != null && form.WindowState == FormWindowState.Minimized)
+                {
+                    return;
+                }
+
                 ResizeWindow(_browserWindowHandle, Width, Height);
             }
         }
@@ -165,6 +185,11 @@
             }
         }
 
+		public void InvalidateSize()
+		{
+			ResizeWindow(_browserWindowHandle, Width, Height);
+		}
+
         private static void ResizeWindow(IntPtr handle, int width, int height)
         {
             if (handle != IntPtr.Zero)
@@ -177,5 +202,92 @@
         }
 
         public CefBrowser Browser { get { return _browser; } }
+
+    	public event EventHandler<ConsoleMessageEventArgs> ConsoleMessage;
+
+		internal protected virtual void OnConsoleMessage(ConsoleMessageEventArgs e)
+    	{
+			if (ConsoleMessage != null)
+				ConsoleMessage(this, e);
+			else
+				e.Handled = false;
+    	}
+
+    	public event EventHandler<LoadingStateChangeEventArgs> LoadingStateChange;
+
+		internal protected virtual void OnLoadingStateChange(LoadingStateChangeEventArgs e)
+		{
+			if (LoadingStateChange != null)
+				LoadingStateChange(this, e);
+		}
+
+    	public event EventHandler<TooltipEventArgs> Tooltip;
+
+		internal protected virtual void OnTooltip(TooltipEventArgs e)
+		{
+			if (Tooltip != null)
+				Tooltip(this, e);
+			else
+				e.Handled = false;
+		}
+
+    	public event EventHandler BeforeClose;
+
+		internal protected virtual void OnBeforeClose()
+		{
+			_browserWindowHandle = IntPtr.Zero;
+			if (BeforeClose != null)
+				BeforeClose(this, EventArgs.Empty);
+		}
+
+    	public event EventHandler<BeforePopupEventArgs> BeforePopup;
+
+		internal protected virtual void OnBeforePopup(BeforePopupEventArgs e)
+		{
+			if (BeforePopup != null)
+				BeforePopup(this, e);
+			else
+				e.Handled = false;
+		}
+
+    	public event EventHandler<LoadEndEventArgs> LoadEnd;
+
+		internal protected virtual void OnLoadEnd(LoadEndEventArgs e)
+		{
+			if (LoadEnd != null)
+				LoadEnd(this, e);
+		}
+
+    	public event EventHandler<LoadErrorEventArgs> LoadError;
+
+		internal protected virtual void OnLoadError(LoadErrorEventArgs e)
+		{
+			if (LoadError != null)
+				LoadError(this, e);
+		}
+
+    	public event EventHandler<LoadStartEventArgs> LoadStarted;
+
+		internal protected virtual void OnLoadStart(LoadStartEventArgs e)
+		{
+			if (LoadStarted != null)
+				LoadStarted(this, e);
+		}
+
+    	public event EventHandler<PluginCrashedEventArgs> PluginCrashed;
+
+		internal protected virtual void OnPluginCrashed(PluginCrashedEventArgs e)
+    	{
+			if (PluginCrashed != null)
+				PluginCrashed(this, e);
+    	}
+
+    	public event EventHandler<RenderProcessTerminatedEventArgs> RenderProcessTerminated;
+
+		internal protected virtual void OnRenderProcessTerminated(RenderProcessTerminatedEventArgs e)
+		{
+			if (RenderProcessTerminated != null)
+				RenderProcessTerminated(this, e);
+		}
     }
 }
