@@ -100,4 +100,24 @@ classdef = {
     'CefEndTracingCallback': { 'role': ROLE_HANDLER },
     # 1916
     'CefCompletionCallback': { 'role': ROLE_HANDLER },
+    # 2062
+    'CefPrintDialogCallback': { 'role': ROLE_PROXY },
+    'CefPrintJobCallback': { 'role': ROLE_PROXY },
+    'CefPrintHandler': { 'role': ROLE_HANDLER },
+    'CefPrintSettings': { 'role': ROLE_PROXY },
+    # r1949
+    'CefNavigationEntryVisitor': { 'role': ROLE_HANDLER },
+    'CefNavigationEntry': { 'role': ROLE_PROXY },
+    # 2272 branch
+    # r2035
+    'CefFindHandler': { 'role': ROLE_HANDLER },
+    'CefSSLCertPrincipal': { 'role': ROLE_PROXY, 'name': 'CefSslCertPrincipal' },
+    'CefSSLInfo': { 'role': ROLE_PROXY, 'name': 'CefSslInfo' },
+    # 2357
+    'CefSetCookieCallback': { 'role': ROLE_HANDLER },
+    'CefDeleteCookiesCallback': { 'role': ROLE_HANDLER },
+    'CefRequestCallback': { 'role': ROLE_PROXY },
+    'CefValue': { 'role': ROLE_PROXY },
+    # 2424
+    'CefPdfPrintCallback': { 'role': ROLE_HANDLER },
     }
