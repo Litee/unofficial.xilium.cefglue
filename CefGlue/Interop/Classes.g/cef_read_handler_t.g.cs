@@ -17,12 +17,13 @@ namespace Xilium.CefGlue.Interop
         internal IntPtr _seek;
         internal IntPtr _tell;
         internal IntPtr _eof;
+        internal IntPtr _may_block;
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG
         [SuppressUnmanagedCodeSecurity]
         #endif
-        internal delegate int add_ref_delegate(cef_read_handler_t* self);
+        internal delegate void add_ref_delegate(cef_read_handler_t* self);
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG
@@ -34,7 +35,7 @@ namespace Xilium.CefGlue.Interop
         #if !DEBUG
         [SuppressUnmanagedCodeSecurity]
         #endif
-        internal delegate int get_refct_delegate(cef_read_handler_t* self);
+        internal delegate int has_one_ref_delegate(cef_read_handler_t* self);
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG
@@ -59,6 +60,12 @@ namespace Xilium.CefGlue.Interop
         [SuppressUnmanagedCodeSecurity]
         #endif
         internal delegate int eof_delegate(cef_read_handler_t* self);
+        
+        [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
+        #if !DEBUG
+        [SuppressUnmanagedCodeSecurity]
+        #endif
+        internal delegate int may_block_delegate(cef_read_handler_t* self);
         
         private static int _sizeof;
         

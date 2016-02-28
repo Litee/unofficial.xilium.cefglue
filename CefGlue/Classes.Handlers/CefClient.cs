@@ -94,6 +94,23 @@ namespace Xilium.CefGlue
         }
 
 
+        private cef_find_handler_t* get_find_handler(cef_client_t* self)
+        {
+            CheckSelf(self);
+
+            var result = GetFindHandler();
+            return result != null ? result.ToNative() : null;
+        }
+
+        /// <summary>
+        /// Return the handler for find result events.
+        /// </summary>
+        protected virtual CefFindHandler GetFindHandler()
+        {
+            return null;
+        }
+
+
         private cef_focus_handler_t* get_focus_handler(cef_client_t* self)
         {
             CheckSelf(self);
@@ -241,7 +258,7 @@ namespace Xilium.CefGlue
 
             var result = OnProcessMessageReceived(m_browser, source_process, m_message);
 
-            m_browser.Dispose();
+            // m_browser.Dispose();
             m_message.Dispose();
 
             return result ? 1 : 0;

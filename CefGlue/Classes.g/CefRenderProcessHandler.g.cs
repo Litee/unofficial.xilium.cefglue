@@ -21,17 +21,18 @@ namespace Xilium.CefGlue
         
         private cef_render_process_handler_t.add_ref_delegate _ds0;
         private cef_render_process_handler_t.release_delegate _ds1;
-        private cef_render_process_handler_t.get_refct_delegate _ds2;
+        private cef_render_process_handler_t.has_one_ref_delegate _ds2;
         private cef_render_process_handler_t.on_render_thread_created_delegate _ds3;
         private cef_render_process_handler_t.on_web_kit_initialized_delegate _ds4;
         private cef_render_process_handler_t.on_browser_created_delegate _ds5;
         private cef_render_process_handler_t.on_browser_destroyed_delegate _ds6;
         private cef_render_process_handler_t.get_load_handler_delegate _ds7;
-        private cef_render_process_handler_t.on_context_created_delegate _ds8;
-        private cef_render_process_handler_t.on_context_released_delegate _ds9;
-        private cef_render_process_handler_t.on_uncaught_exception_delegate _dsa;
-        private cef_render_process_handler_t.on_focused_node_changed_delegate _dsb;
-        private cef_render_process_handler_t.on_process_message_received_delegate _dsc;
+        private cef_render_process_handler_t.on_before_navigation_delegate _ds8;
+        private cef_render_process_handler_t.on_context_created_delegate _ds9;
+        private cef_render_process_handler_t.on_context_released_delegate _dsa;
+        private cef_render_process_handler_t.on_uncaught_exception_delegate _dsb;
+        private cef_render_process_handler_t.on_focused_node_changed_delegate _dsc;
+        private cef_render_process_handler_t.on_process_message_received_delegate _dsd;
         
         protected CefRenderProcessHandler()
         {
@@ -41,8 +42,8 @@ namespace Xilium.CefGlue
             _self->_base._add_ref = Marshal.GetFunctionPointerForDelegate(_ds0);
             _ds1 = new cef_render_process_handler_t.release_delegate(release);
             _self->_base._release = Marshal.GetFunctionPointerForDelegate(_ds1);
-            _ds2 = new cef_render_process_handler_t.get_refct_delegate(get_refct);
-            _self->_base._get_refct = Marshal.GetFunctionPointerForDelegate(_ds2);
+            _ds2 = new cef_render_process_handler_t.has_one_ref_delegate(has_one_ref);
+            _self->_base._has_one_ref = Marshal.GetFunctionPointerForDelegate(_ds2);
             _ds3 = new cef_render_process_handler_t.on_render_thread_created_delegate(on_render_thread_created);
             _self->_on_render_thread_created = Marshal.GetFunctionPointerForDelegate(_ds3);
             _ds4 = new cef_render_process_handler_t.on_web_kit_initialized_delegate(on_web_kit_initialized);
@@ -53,16 +54,18 @@ namespace Xilium.CefGlue
             _self->_on_browser_destroyed = Marshal.GetFunctionPointerForDelegate(_ds6);
             _ds7 = new cef_render_process_handler_t.get_load_handler_delegate(get_load_handler);
             _self->_get_load_handler = Marshal.GetFunctionPointerForDelegate(_ds7);
-            _ds8 = new cef_render_process_handler_t.on_context_created_delegate(on_context_created);
-            _self->_on_context_created = Marshal.GetFunctionPointerForDelegate(_ds8);
-            _ds9 = new cef_render_process_handler_t.on_context_released_delegate(on_context_released);
-            _self->_on_context_released = Marshal.GetFunctionPointerForDelegate(_ds9);
-            _dsa = new cef_render_process_handler_t.on_uncaught_exception_delegate(on_uncaught_exception);
-            _self->_on_uncaught_exception = Marshal.GetFunctionPointerForDelegate(_dsa);
-            _dsb = new cef_render_process_handler_t.on_focused_node_changed_delegate(on_focused_node_changed);
-            _self->_on_focused_node_changed = Marshal.GetFunctionPointerForDelegate(_dsb);
-            _dsc = new cef_render_process_handler_t.on_process_message_received_delegate(on_process_message_received);
-            _self->_on_process_message_received = Marshal.GetFunctionPointerForDelegate(_dsc);
+            _ds8 = new cef_render_process_handler_t.on_before_navigation_delegate(on_before_navigation);
+            _self->_on_before_navigation = Marshal.GetFunctionPointerForDelegate(_ds8);
+            _ds9 = new cef_render_process_handler_t.on_context_created_delegate(on_context_created);
+            _self->_on_context_created = Marshal.GetFunctionPointerForDelegate(_ds9);
+            _dsa = new cef_render_process_handler_t.on_context_released_delegate(on_context_released);
+            _self->_on_context_released = Marshal.GetFunctionPointerForDelegate(_dsa);
+            _dsb = new cef_render_process_handler_t.on_uncaught_exception_delegate(on_uncaught_exception);
+            _self->_on_uncaught_exception = Marshal.GetFunctionPointerForDelegate(_dsb);
+            _dsc = new cef_render_process_handler_t.on_focused_node_changed_delegate(on_focused_node_changed);
+            _self->_on_focused_node_changed = Marshal.GetFunctionPointerForDelegate(_dsc);
+            _dsd = new cef_render_process_handler_t.on_process_message_received_delegate(on_process_message_received);
+            _self->_on_process_message_received = Marshal.GetFunctionPointerForDelegate(_dsd);
         }
         
         ~CefRenderProcessHandler()
@@ -79,7 +82,7 @@ namespace Xilium.CefGlue
             }
         }
         
-        private int add_ref(cef_render_process_handler_t* self)
+        private void add_ref(cef_render_process_handler_t* self)
         {
             lock (SyncRoot)
             {
@@ -88,7 +91,6 @@ namespace Xilium.CefGlue
                 {
                     lock (_roots) { _roots.Add((IntPtr)_self, this); }
                 }
-                return result;
             }
         }
         
@@ -100,14 +102,15 @@ namespace Xilium.CefGlue
                 if (result == 0)
                 {
                     lock (_roots) { _roots.Remove((IntPtr)_self); }
+                    return 1;
                 }
-                return result;
+                return 0;
             }
         }
         
-        private int get_refct(cef_render_process_handler_t* self)
+        private int has_one_ref(cef_render_process_handler_t* self)
         {
-            return _refct;
+            lock (SyncRoot) { return _refct == 1 ? 1 : 0; }
         }
         
         internal cef_render_process_handler_t* ToNative()
