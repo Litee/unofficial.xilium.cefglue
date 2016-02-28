@@ -17,6 +17,7 @@ namespace Xilium.CefGlue.Interop
         internal IntPtr _seek;
         internal IntPtr _tell;
         internal IntPtr _flush;
+        internal IntPtr _may_block;
         
         // CreateForFile
         [DllImport(libcef.DllName, EntryPoint = "cef_stream_writer_create_for_file", CallingConvention = libcef.CEF_CALL)]
@@ -30,7 +31,7 @@ namespace Xilium.CefGlue.Interop
         #if !DEBUG
         [SuppressUnmanagedCodeSecurity]
         #endif
-        private delegate int add_ref_delegate(cef_stream_writer_t* self);
+        private delegate void add_ref_delegate(cef_stream_writer_t* self);
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG
@@ -42,7 +43,7 @@ namespace Xilium.CefGlue.Interop
         #if !DEBUG
         [SuppressUnmanagedCodeSecurity]
         #endif
-        private delegate int get_refct_delegate(cef_stream_writer_t* self);
+        private delegate int has_one_ref_delegate(cef_stream_writer_t* self);
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG
@@ -68,11 +69,17 @@ namespace Xilium.CefGlue.Interop
         #endif
         private delegate int flush_delegate(cef_stream_writer_t* self);
         
+        [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
+        #if !DEBUG
+        [SuppressUnmanagedCodeSecurity]
+        #endif
+        private delegate int may_block_delegate(cef_stream_writer_t* self);
+        
         // AddRef
         private static IntPtr _p0;
         private static add_ref_delegate _d0;
         
-        public static int add_ref(cef_stream_writer_t* self)
+        public static void add_ref(cef_stream_writer_t* self)
         {
             add_ref_delegate d;
             var p = self->_base._add_ref;
@@ -82,7 +89,7 @@ namespace Xilium.CefGlue.Interop
                 d = (add_ref_delegate)Marshal.GetDelegateForFunctionPointer(p, typeof(add_ref_delegate));
                 if (_p0 == IntPtr.Zero) { _d0 = d; _p0 = p; }
             }
-            return d(self);
+            d(self);
         }
         
         // Release
@@ -102,18 +109,18 @@ namespace Xilium.CefGlue.Interop
             return d(self);
         }
         
-        // GetRefCt
+        // HasOneRef
         private static IntPtr _p2;
-        private static get_refct_delegate _d2;
+        private static has_one_ref_delegate _d2;
         
-        public static int get_refct(cef_stream_writer_t* self)
+        public static int has_one_ref(cef_stream_writer_t* self)
         {
-            get_refct_delegate d;
-            var p = self->_base._get_refct;
+            has_one_ref_delegate d;
+            var p = self->_base._has_one_ref;
             if (p == _p2) { d = _d2; }
             else
             {
-                d = (get_refct_delegate)Marshal.GetDelegateForFunctionPointer(p, typeof(get_refct_delegate));
+                d = (has_one_ref_delegate)Marshal.GetDelegateForFunctionPointer(p, typeof(has_one_ref_delegate));
                 if (_p2 == IntPtr.Zero) { _d2 = d; _p2 = p; }
             }
             return d(self);
@@ -183,6 +190,23 @@ namespace Xilium.CefGlue.Interop
             {
                 d = (flush_delegate)Marshal.GetDelegateForFunctionPointer(p, typeof(flush_delegate));
                 if (_p6 == IntPtr.Zero) { _d6 = d; _p6 = p; }
+            }
+            return d(self);
+        }
+        
+        // MayBlock
+        private static IntPtr _p7;
+        private static may_block_delegate _d7;
+        
+        public static int may_block(cef_stream_writer_t* self)
+        {
+            may_block_delegate d;
+            var p = self->_may_block;
+            if (p == _p7) { d = _d7; }
+            else
+            {
+                d = (may_block_delegate)Marshal.GetDelegateForFunctionPointer(p, typeof(may_block_delegate));
+                if (_p7 == IntPtr.Zero) { _d7 = d; _p7 = p; }
             }
             return d(self);
         }

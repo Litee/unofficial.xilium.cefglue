@@ -18,6 +18,7 @@ namespace Xilium.CefGlue.Interop
         internal IntPtr _on_browser_created;
         internal IntPtr _on_browser_destroyed;
         internal IntPtr _get_load_handler;
+        internal IntPtr _on_before_navigation;
         internal IntPtr _on_context_created;
         internal IntPtr _on_context_released;
         internal IntPtr _on_uncaught_exception;
@@ -28,7 +29,7 @@ namespace Xilium.CefGlue.Interop
         #if !DEBUG
         [SuppressUnmanagedCodeSecurity]
         #endif
-        internal delegate int add_ref_delegate(cef_render_process_handler_t* self);
+        internal delegate void add_ref_delegate(cef_render_process_handler_t* self);
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG
@@ -40,7 +41,7 @@ namespace Xilium.CefGlue.Interop
         #if !DEBUG
         [SuppressUnmanagedCodeSecurity]
         #endif
-        internal delegate int get_refct_delegate(cef_render_process_handler_t* self);
+        internal delegate int has_one_ref_delegate(cef_render_process_handler_t* self);
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG
@@ -71,6 +72,12 @@ namespace Xilium.CefGlue.Interop
         [SuppressUnmanagedCodeSecurity]
         #endif
         internal delegate cef_load_handler_t* get_load_handler_delegate(cef_render_process_handler_t* self);
+        
+        [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
+        #if !DEBUG
+        [SuppressUnmanagedCodeSecurity]
+        #endif
+        internal delegate int on_before_navigation_delegate(cef_render_process_handler_t* self, cef_browser_t* browser, cef_frame_t* frame, cef_request_t* request, CefNavigationType navigation_type, int is_redirect);
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG

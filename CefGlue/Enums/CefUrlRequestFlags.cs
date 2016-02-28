@@ -20,25 +20,15 @@ namespace Xilium.CefGlue
         SkipCache = 1 << 0,
 
         /// <summary>
-        /// If set user name, password, and cookies may be sent with the request.
+        /// If set user name, password, and cookies may be sent with the request, and
+        /// cookies may be saved from the response.
         /// </summary>
         AllowCachedCredentials = 1 << 1,
-
-        /// <summary>
-        /// If set cookies may be sent with the request and saved from the response.
-        /// <c>AllowCachedCredentials</c> must also be set.
-        /// </summary>
-        AllowCookies = 1 << 2,
 
         /// <summary>
         /// If set upload progress events will be generated when a request has a body.
         /// </summary>
         ReportUploadProgress = 1 << 3,
-
-        /// <summary>
-        /// If set load timing info will be collected for the request.
-        /// </summary>
-        ReportLoadTiming = 1 << 4,
 
         /// <summary>
         /// If set the headers sent and received for the request will be recorded.

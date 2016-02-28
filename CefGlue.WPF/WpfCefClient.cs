@@ -10,6 +10,7 @@ namespace Xilium.CefGlue.WPF
         private WpfCefLifeSpanHandler _lifeSpanHandler;
         private WpfCefDisplayHandler _displayHandler;
         private WpfCefRenderHandler _renderHandler;
+        private WpfCefLoadHandler _loadHandler;
         private WpfCefJSDialogHandler _jsDialogHandler;
 
         public WpfCefClient(WpfCefBrowser owner)
@@ -21,6 +22,7 @@ namespace Xilium.CefGlue.WPF
             _lifeSpanHandler = new WpfCefLifeSpanHandler(owner);
             _displayHandler = new WpfCefDisplayHandler(owner);
             _renderHandler = new WpfCefRenderHandler(owner, new NLogLogger("WpfCefRenderHandler"), new UiHelper(new NLogLogger("WpfCefRenderHandler")));
+            _loadHandler = new WpfCefLoadHandler(owner);
             _jsDialogHandler = new WpfCefJSDialogHandler();
         }
 
@@ -37,6 +39,11 @@ namespace Xilium.CefGlue.WPF
         protected override CefRenderHandler GetRenderHandler()
         {
             return _renderHandler;
+        }
+
+        protected override CefLoadHandler GetLoadHandler()
+        {
+            return _loadHandler;
         }
 
         protected override CefJSDialogHandler GetJSDialogHandler()

@@ -47,7 +47,7 @@
 
         internal void OnCreated(CefBrowser browser)
         {
-            if (_created) throw new InvalidOperationException("Browser already created.");
+            //if (_created) throw new InvalidOperationException("Browser already created.");
             _created = true;
             _browser = browser;
 
@@ -58,10 +58,13 @@
             }
         }
 
-        internal void Close()
+        public void Close()
         {
             if (_browser != null)
             {
+                var host = _browser.GetHost();
+                host.CloseBrowser(true);
+                host.Dispose();
                 _browser.Dispose();
                 _browser = null;
             }

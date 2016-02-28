@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -12,6 +14,11 @@ namespace Xilium.CefGlue.WPF
 {
     public class WpfCefBrowser : ContentControl, IDisposable
     {
+        private static readonly Key[] HandledKeys =
+        {
+            Key.Tab, Key.Home, Key.End, Key.Left, Key.Right, Key.Up, Key.Down
+        };
+
         private bool _disposed;
         private bool _created;
 
@@ -25,6 +32,13 @@ namespace Xilium.CefGlue.WPF
         private CefBrowser _browser;
         private CefBrowserHost _browserHost;
         private WpfCefClient _cefClient;
+
+        private Popup _popup;
+        private Image _popupImage;
+        private WriteableBitmap _popupImageBitmap;
+
+        private ToolTip _tooltip;
+        private DispatcherTimer _tooltipTimer;
 
         Dispatcher _mainUiDispatcher;
 
@@ -44,6 +58,16 @@ namespace Xilium.CefGlue.WPF
             _logger = logger;
 
             StartUrl = "about:blank";
+
+            _popup = CreatePopup();
+
+            _tooltip = new ToolTip();
+            _tooltip.StaysOpen = true;
+            _tooltip.Visibility = Visibility.Collapsed;
+            _tooltip.Closed += TooltipOnClosed;
+
+            _tooltipTimer = new DispatcherTimer();
+            _tooltipTimer.Interval = TimeSpan.FromSeconds(0.5);
 
             KeyboardNavigation.SetAcceptsReturn(this, true);
             _mainUiDispatcher = Dispatcher.CurrentDispatcher;
@@ -66,6 +90,11 @@ namespace Xilium.CefGlue.WPF
         {
             if (disposing)
             {
+                if (_tooltipTimer != null)
+                {
+                    _tooltipTimer.Stop();
+                }
+
                 if (_browserPageImage != null)
                 {
                     _browserPageImage.Source = null;
@@ -99,7 +128,48 @@ namespace Xilium.CefGlue.WPF
 
         #endregion
 
+        public event LoadStartEventHandler LoadStart;
+        public event LoadEndEventHandler LoadEnd;
+        public event LoadingStateChangeEventHandler LoadingStateChange;
+        public event LoadErrorEventHandler LoadError;
+
+
+        internal void OnLoadStart(CefFrame frame)
+        { 
+            if (this.LoadStart != null)
+            {
+                var e = new LoadStartEventArgs(frame);
+                this.LoadStart(this, e);
+            }
+        }
+
+        internal void OnLoadEnd(CefFrame frame, int httpStatusCode)
+        {
+            if(this.LoadEnd != null)
+            {
+                var e = new LoadEndEventArgs(frame, httpStatusCode);
+                this.LoadEnd(this, e);
+            }
+        }
+        internal void OnLoadingStateChange(bool isLoading, bool canGoBack, bool canGoForward)
+        {
+            if (this.LoadingStateChange != null)
+            {
+                var e = new LoadingStateChangeEventArgs(isLoading, canGoBack, canGoForward);
+                this.LoadingStateChange(this, e);
+            }
+        }
+        internal void OnLoadError(CefFrame frame, CefErrorCode errorCode, string errorText, string failedUrl)
+        {
+            if (this.LoadError != null)
+            {
+                var e = new LoadErrorEventArgs(frame, errorCode, errorText, failedUrl);
+                this.LoadError(this, e);
+            }
+        }
+
         public string StartUrl { get; set; }
+        public bool AllowsTransparency { get; set; }
 
         public override void OnApplyTemplate()
         {
@@ -117,6 +187,13 @@ namespace Xilium.CefGlue.WPF
 
             this.Content = _browserPageImage;
         }
+
+        public void ExecuteJavaScript(string code, string url, int line)
+        {
+            if (_browser != null)
+                this._browser.GetMainFrame().ExecuteJavaScript(code, url, line);
+        }
+
 
         protected override Size ArrangeOverride(Size arrangeBounds)
         {
@@ -147,7 +224,7 @@ namespace Xilium.CefGlue.WPF
                             IntPtr hParentWnd = new WindowInteropHelper(parentWnd).Handle;
 
                             var windowInfo = CefWindowInfo.Create();
-                            windowInfo.SetAsOffScreen(hParentWnd);
+                            windowInfo.SetAsWindowless(hParentWnd, AllowsTransparency);
 
                             var settings = new CefBrowserSettings();
                             _cefClient = new WpfCefClient(this);
@@ -181,57 +258,39 @@ namespace Xilium.CefGlue.WPF
             return size;
         }
 
-        private void AttachEventHandlers(UIElement uiElement)
+        private void AttachEventHandlers(WpfCefBrowser browser)
         {
-            uiElement.GotFocus += (sender, arg) =>
+            browser.GotKeyboardFocus += (sender, arg) =>
             {
                 try
                 {
                     if (_browserHost != null)
                     {
-                        // this.browserHost.SetFocus(true);
                         _browserHost.SendFocusEvent(true);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.ErrorException("WpfCefBrowser: Caught exception in GotFocus()", ex);
                 }
             };
 
-            uiElement.LostFocus += (sender, arg) =>
+            browser.LostKeyboardFocus += (sender, arg) =>
             {
                 try
                 {
                     if (_browserHost != null)
                     {
-                        // this.browserHost.SetFocus(false);
                         _browserHost.SendFocusEvent(false);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.ErrorException("WpfCefBrowser: Caught exception in LostFocus()", ex);
                 }
             };
 
-            uiElement.LostMouseCapture += (sender, arg) =>
-            {
-                try
-                {
-                    if (_browserHost != null)
-                    {
-                        _browserHost.SendCaptureLostEvent();
-                        //_logger.Debug("Browser_LostMouseCapture");
-                    }
-                }
-                catch(Exception ex)
-                {
-                    _logger.ErrorException("WpfCefBrowser: Caught exception in LostMouseCapture()", ex);
-                }
-            };
-
-            uiElement.MouseLeave += (sender, arg) =>
+            browser.MouseLeave += (sender, arg) =>
             {
                 try
                 {
@@ -243,17 +302,19 @@ namespace Xilium.CefGlue.WPF
                             Y = 0
                         };
 
+                        mouseEvent.Modifiers = GetMouseModifiers();
+
                         _browserHost.SendMouseMoveEvent(mouseEvent, true);
                         //_logger.Debug("Browser_MouseLeave");
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.ErrorException("WpfCefBrowser: Caught exception in MouseLeave()", ex);
                 }
             };
 
-            uiElement.MouseMove += (sender, arg) =>
+            browser.MouseMove += (sender, arg) =>
             {
                 try
                 {
@@ -267,27 +328,26 @@ namespace Xilium.CefGlue.WPF
                             Y = (int)cursorPos.Y
                         };
 
+                        mouseEvent.Modifiers = GetMouseModifiers();
+
                         _browserHost.SendMouseMoveEvent(mouseEvent, false);
 
                         //_logger.Debug(string.Format("Browser_MouseMove: ({0},{1})", cursorPos.X, cursorPos.Y));
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.ErrorException("WpfCefBrowser: Caught exception in MouseMove()", ex);
                 }
-
-                arg.Handled = true;
             };
 
-            uiElement.MouseDown += (sender, arg) =>
+            browser.MouseDown += (sender, arg) =>
             {
                 try
                 {
                     if (_browserHost != null)
                     {
-                        CaptureMouse();
-                        Keyboard.Focus(this);
+                        Focus();
 
                         Point cursorPos = arg.GetPosition(this);
 
@@ -300,24 +360,22 @@ namespace Xilium.CefGlue.WPF
                         mouseEvent.Modifiers = GetMouseModifiers();
 
                         if (arg.ChangedButton == MouseButton.Left)
-                            _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Left, false, 1);
+                            _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Left, false, arg.ClickCount);
                         else if (arg.ChangedButton == MouseButton.Middle)
-                            _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Middle, false, 1);
+                            _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Middle, false, arg.ClickCount);
                         else if (arg.ChangedButton == MouseButton.Right)
-                            _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Right, false, 1);
+                            _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Right, false, arg.ClickCount);
 
                         //_logger.Debug(string.Format("Browser_MouseDown: ({0},{1})", cursorPos.X, cursorPos.Y));
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.ErrorException("WpfCefBrowser: Caught exception in MouseDown()", ex);
                 }
-
-                arg.Handled = true;
             };
 
-            uiElement.MouseUp += (sender, arg) =>
+            browser.MouseUp += (sender, arg) =>
             {
                 try
                 {
@@ -334,26 +392,22 @@ namespace Xilium.CefGlue.WPF
                         mouseEvent.Modifiers = GetMouseModifiers();
 
                         if (arg.ChangedButton == MouseButton.Left)
-                            _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Left, true, 1);
+                            _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Left, true, arg.ClickCount);
                         else if (arg.ChangedButton == MouseButton.Middle)
-                            _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Middle, true, 1);
+                            _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Middle, true, arg.ClickCount);
                         else if (arg.ChangedButton == MouseButton.Right)
-                            _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Right, true, 1);
+                            _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Right, true, arg.ClickCount);
 
                         //_logger.Debug(string.Format("Browser_MouseUp: ({0},{1})", cursorPos.X, cursorPos.Y));
-
-                        ReleaseMouseCapture();
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.ErrorException("WpfCefBrowser: Caught exception in MouseUp()", ex);
                 }
-
-                arg.Handled = true;
             };
 
-            uiElement.MouseWheel += (sender, arg) =>
+            browser.MouseWheel += (sender, arg) =>
             {
                 try
                 {
@@ -370,16 +424,14 @@ namespace Xilium.CefGlue.WPF
                         _browserHost.SendMouseWheelEvent(mouseEvent, 0, arg.Delta);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.ErrorException("WpfCefBrowser: Caught exception in MouseWheel()", ex);
                 }
-
-                arg.Handled = true;
             };
 
             // TODO: require more intelligent processing
-            uiElement.PreviewTextInput += (sender, arg) =>
+            browser.PreviewTextInput += (sender, arg) =>
             {
                 if (_browserHost != null)
                 {
@@ -394,6 +446,8 @@ namespace Xilium.CefGlue.WPF
                             // Character = c,
                         };
 
+                        keyEvent.Modifiers = GetKeyboardModifiers();
+
                         _browserHost.SendKeyEvent(keyEvent);
                     }
                 }
@@ -402,7 +456,7 @@ namespace Xilium.CefGlue.WPF
             };
 
             // TODO: require more intelligent processing
-            uiElement.PreviewKeyDown += (sender, arg) =>
+            browser.PreviewKeyDown += (sender, arg) =>
             {
                 try
                 {
@@ -417,19 +471,21 @@ namespace Xilium.CefGlue.WPF
                             IsSystemKey = arg.Key == Key.System,
                         };
 
+                        keyEvent.Modifiers = GetKeyboardModifiers();
+
                         _browserHost.SendKeyEvent(keyEvent);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.ErrorException("WpfCefBrowser: Caught exception in PreviewKeyDown()", ex);
                 }
 
-                arg.Handled = false;
+                arg.Handled = HandledKeys.Contains(arg.Key);
             };
 
             // TODO: require more intelligent processing
-            uiElement.PreviewKeyUp += (sender, arg) =>
+            browser.PreviewKeyUp += (sender, arg) =>
             {
                 try
                 {
@@ -444,15 +500,94 @@ namespace Xilium.CefGlue.WPF
                             IsSystemKey = arg.Key == Key.System,
                         };
 
+                        keyEvent.Modifiers = GetKeyboardModifiers();
+
                         _browserHost.SendKeyEvent(keyEvent);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.ErrorException("WpfCefBrowser: Caught exception in PreviewKeyUp()", ex);
                 }
 
-                arg.Handled = false;
+                arg.Handled = true;
+            };
+            browser._popup.MouseMove += (sender, arg) =>
+            {
+                try
+                {
+                    if (_browserHost != null)
+                    {
+                        Point cursorPos = arg.GetPosition(this);
+
+                        CefMouseEvent mouseEvent = new CefMouseEvent()
+                        {
+                            X = (int)cursorPos.X,
+                            Y = (int)cursorPos.Y
+                        };
+
+                        mouseEvent.Modifiers = GetMouseModifiers();
+
+                        _browserHost.SendMouseMoveEvent(mouseEvent, false);
+
+                        //_logger.Debug(string.Format("Popup_MouseMove: ({0},{1})", cursorPos.X, cursorPos.Y));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.ErrorException("WpfCefBrowser: Caught exception in Popup.MouseMove()", ex);
+                }
+            };
+            browser._popup.MouseDown += (sender, arg) =>
+            {
+                try
+                {
+                    if (_browserHost != null)
+                    {
+                        Point cursorPos = arg.GetPosition(this);
+
+                        CefMouseEvent mouseEvent = new CefMouseEvent()
+                        {
+                            X = (int)cursorPos.X,
+                            Y = (int)cursorPos.Y
+                        };
+
+                        mouseEvent.Modifiers = GetMouseModifiers();
+
+                        _browserHost.SendMouseClickEvent(mouseEvent, CefMouseButtonType.Left, true, 1);
+
+                        //_logger.Debug(string.Format("Popup_MouseDown: ({0},{1})", cursorPos.X, cursorPos.Y));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.ErrorException("WpfCefBrowser: Caught exception in Popup.MouseDown()", ex);
+                }
+            };
+            browser._popup.MouseWheel += (sender, arg) =>
+            {
+                try
+                {
+                    if (_browserHost != null)
+                    {
+                        Point cursorPos = arg.GetPosition(this);
+                        int delta = arg.Delta;
+                        CefMouseEvent mouseEvent = new CefMouseEvent()
+                        {
+                            X = (int)cursorPos.X,
+                            Y = (int)cursorPos.Y
+                        };
+
+                        mouseEvent.Modifiers = GetMouseModifiers();
+                        _browserHost.SendMouseWheelEvent(mouseEvent, 0, delta);
+
+                        //_logger.Debug(string.Format("MouseWheel: ({0},{1})", cursorPos.X, cursorPos.Y));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.ErrorException("WpfCefBrowser: Caught exception in Popup.MouseWheel()", ex);
+                }
             };
         }
 
@@ -569,7 +704,7 @@ namespace Xilium.CefGlue.WPF
                 {
                     if (_browserSizeChanged)
                     {
-                        _browserPageBitmap = new WriteableBitmap((int)_browserWidth, (int)_browserHeight, 96, 96, PixelFormats.Bgr32, null);
+                        _browserPageBitmap = new WriteableBitmap((int)_browserWidth, (int)_browserHeight, 96, 96, AllowsTransparency ? PixelFormats.Bgra32 : PixelFormats.Bgr32, null);
                         _browserPageImage.Source = _browserPageBitmap;
 
                         _browserSizeChanged = false;
@@ -586,6 +721,50 @@ namespace Xilium.CefGlue.WPF
                     _logger.ErrorException("WpfCefBrowser: Caught exception in HandleViewPaint()", ex);
                 }
             }));
+        }
+
+        internal void HandlePopupPaint(int width, int height, CefRectangle[] dirtyRects, IntPtr sourceBuffer)
+        {
+            if (width == 0 || height == 0)
+            {
+                return;
+            }
+
+            _mainUiDispatcher.Invoke(
+                DispatcherPriority.Render,
+                new Action(
+                    () =>
+                    {
+                        int stride = width * 4;
+                        int sourceBufferSize = stride * height;
+
+                        _logger.Debug("RenderPopup() Bitmap H{0}xW{1}, Browser H{2}xW{3}", _popupImageBitmap.Height, _popupImageBitmap.Width, width, height);
+
+
+                        foreach (CefRectangle dirtyRect in dirtyRects)
+                        {
+                            _logger.Debug(
+                                string.Format(
+                                    "Dirty rect [{0},{1},{2},{3}]",
+                                    dirtyRect.X,
+                                    dirtyRect.Y,
+                                    dirtyRect.Width,
+                                    dirtyRect.Height));
+
+                            if (dirtyRect.Width == 0 || dirtyRect.Height == 0)
+                            {
+                                continue;
+                            }
+
+                            int adjustedWidth = dirtyRect.Width;
+
+                            int adjustedHeight = dirtyRect.Height;
+
+                            Int32Rect sourceRect = new Int32Rect(dirtyRect.X, dirtyRect.Y, adjustedWidth, adjustedHeight);
+
+                            _popupImageBitmap.WritePixels(sourceRect, sourceBuffer, sourceBufferSize, stride, dirtyRect.X, dirtyRect.Y);
+                        }
+                    }));
         }
 
         private void DoRenderBrowser(WriteableBitmap bitmap, int browserWidth, int browserHeight, CefRectangle[] dirtyRects, IntPtr sourceBuffer)
@@ -642,6 +821,56 @@ namespace Xilium.CefGlue.WPF
             }
         }
 
+        internal void OnPopupShow(bool show)
+        {
+            if (_popup == null)
+            {
+                return;
+            }
+
+            _mainUiDispatcher.Invoke(new Action(() => _popup.IsOpen = show));
+        }
+
+        internal void OnPopupSize(CefRectangle rect)
+        {
+            _mainUiDispatcher.Invoke(
+                new Action(
+                    () =>
+                    {
+                        _popupImageBitmap = null;
+                        _popupImageBitmap = new WriteableBitmap(
+                            rect.Width,
+                            rect.Height,
+                            96,
+                            96,
+                            PixelFormats.Bgr32,
+                            null);
+
+                        _popupImage.Source = this._popupImageBitmap;
+
+                        _popup.Width = rect.Width;
+                        _popup.Height = rect.Height;
+                        _popup.HorizontalOffset = rect.X;
+                        _popup.VerticalOffset = rect.Y;
+                    }));
+        }
+
+        internal bool OnTooltip(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                _tooltipTimer.Stop();
+                UpdateTooltip(null);
+            }
+            else
+            {
+                _tooltipTimer.Tick += (sender, args) => UpdateTooltip(text);
+                _tooltipTimer.Start();
+            }
+
+            return true;
+        }
+
         #endregion
 
         #region Utils
@@ -681,6 +910,77 @@ namespace Xilium.CefGlue.WPF
             return modifiers;
         }
 
+        private static CefEventFlags GetKeyboardModifiers()
+        {
+            CefEventFlags modifiers = new CefEventFlags();
+
+            if (Keyboard.Modifiers == ModifierKeys.Alt)
+                modifiers |= CefEventFlags.AltDown;
+
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+                modifiers |= CefEventFlags.ControlDown;
+
+            if (Keyboard.Modifiers == ModifierKeys.Shift)
+                modifiers |= CefEventFlags.ShiftDown;
+
+            return modifiers;
+        }
+
+        private Popup CreatePopup()
+        {
+            var popup = new Popup
+            {
+                Child = this._popupImage = CreatePopupImage(),
+                PlacementTarget = this,
+                Placement = PlacementMode.Relative
+            };
+
+            return popup;
+        }
+
+        private Image CreatePopupImage()
+        {
+            var temp = new Image();
+
+            RenderOptions.SetBitmapScalingMode(temp, BitmapScalingMode.NearestNeighbor);
+
+            temp.Stretch = Stretch.None;
+            temp.HorizontalAlignment = HorizontalAlignment.Left;
+            temp.VerticalAlignment = VerticalAlignment.Top;
+            temp.Source = _popupImageBitmap;
+
+            return temp;
+        }
+
+        private void UpdateTooltip(string text)
+        {
+            _mainUiDispatcher.Invoke(
+                DispatcherPriority.Render,
+                new Action(
+                    () =>
+                    {
+                        if (string.IsNullOrEmpty(text))
+                        {
+                            _tooltip.IsOpen = false;
+                        }
+                        else
+                        {
+                            _tooltip.Placement = PlacementMode.Mouse;
+                            _tooltip.Content = text;
+                            _tooltip.IsOpen = true;
+                            _tooltip.Visibility = Visibility.Visible;
+                        }
+                    }));
+
+            _tooltipTimer.Stop();
+        }
+
+        private void TooltipOnClosed(object sender, RoutedEventArgs routedEventArgs)
+        {
+            _tooltip.Visibility = Visibility.Collapsed;
+            _tooltip.Placement = PlacementMode.Absolute;
+        }
+
         #endregion
 
         #region Methods
@@ -694,6 +994,15 @@ namespace Xilium.CefGlue.WPF
                 _browser.GetMainFrame().LoadUrl(url);
             else
                 StartUrl = url;
+        }
+
+        public void LoadString(string content, string url)
+        {
+            // Remove leading whitespace from the URL
+            url = url.TrimStart();
+
+            if (_browser != null)
+                _browser.GetMainFrame().LoadString(content, url);
         }
 
         public bool CanGoBack()

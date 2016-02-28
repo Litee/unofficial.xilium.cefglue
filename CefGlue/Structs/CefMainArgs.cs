@@ -7,16 +7,15 @@
     using System.Reflection;
     using System.Runtime.InteropServices;
     using Xilium.CefGlue.Interop;
+    using Windows = Xilium.CefGlue.Platform.Windows;
 
     public sealed unsafe class CefMainArgs
     {
-        private readonly Module _module;
         private readonly string[] _args;
         private IntPtr _argcArgvBlock;
 
         public CefMainArgs(string[] args)
         {
-            _module = Assembly.GetEntryAssembly().GetModules()[0];
             _args = args;
             _argcArgvBlock = IntPtr.Zero;
         }
@@ -40,7 +39,7 @@
         private cef_main_args_t_windows* ToNativeWindows()
         {
             var ptr = cef_main_args_t_windows.Alloc();
-            ptr->instance = Marshal.GetHINSTANCE(_module);
+            ptr->instance = Windows.NativeMethods.GetModuleHandle(null);
             return ptr;
         }
 

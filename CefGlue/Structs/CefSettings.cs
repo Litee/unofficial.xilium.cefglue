@@ -12,6 +12,11 @@
     /// </summary>
     public sealed unsafe class CefSettings
     {
+        public CefSettings()
+        {
+            BackgroundColor = new CefColor(255, 255, 255, 255);
+        }
+
         /// <summary>
         /// Set to <c>true</c> to use a single process for the browser and renderer. This
         /// run mode is not officially supported by Chromium and is less stable than
@@ -19,6 +24,13 @@
         /// command-line switch.
         /// </summary>
         public bool SingleProcess { get; set; }
+
+        /// <summary>
+        /// Set to <c>true</c> to disable the sandbox for sub-processes. See
+        /// cef_sandbox_win.h for requirements to enable the sandbox on Windows. Also
+        /// configurable using the "no-sandbox" command-line switch.
+        /// </summary>
+        public bool NoSandbox { get; set; }
 
         /// <summary>
         /// The path to a separate executable that will be launched for sub-processes.
@@ -31,9 +43,17 @@
         /// <summary>
         /// Set to <c>true</c> to have the browser process message loop run in a separate
         /// thread. If <c>false</c> than the CefDoMessageLoopWork() function must be
-        /// called from your application message loop.
+        /// called from your application message loop. This option is only supported on
+        /// Windows.
         /// </summary>
         public bool MultiThreadedMessageLoop { get; set; }
+
+        /// <summary>
+        /// Set to true (1) to enable windowless (off-screen) rendering support. Do not
+        /// enable this value if the application does not use windowless rendering as
+        /// it may reduce rendering performance on some systems.
+        /// </summary>
+        public bool WindowlessRenderingEnabled { get; set; }
 
         /// <summary>
         /// Set to <c>true</c> to disable configuration of browser process features using
@@ -44,20 +64,34 @@
         public bool CommandLineArgsDisabled { get; set; }
 
         /// <summary>
-        /// The location where cache data will be stored on disk. If empty an in-memory
-        /// cache will be used for some features and a temporary disk cache for others.
-        /// HTML5 databases such as localStorage will only persist across sessions if a
-        /// cache path is specified.
+        /// The location where cache data will be stored on disk. If empty then
+        /// browsers will be created in "incognito mode" where in-memory caches are
+        /// used for storage and no data is persisted to disk. HTML5 databases such as
+        /// localStorage will only persist across sessions if a cache path is
+        /// specified. Can be overridden for individual CefRequestContext instances via
+        /// the CefRequestContextSettings.cache_path value.
         /// </summary>
         public string CachePath { get; set; }
+
+        /// <summary>
+        /// The location where user data such as spell checking dictionary files will
+        /// be stored on disk. If empty then the default platform-specific user data
+        /// directory will be used ("~/.cef_user_data" directory on Linux,
+        /// "~/Library/Application Support/CEF/User Data" directory on Mac OS X,
+        /// "Local Settings\Application Data\CEF\User Data" directory under the user
+        /// profile directory on Windows).
+        /// </summary>
+        public string UserDataPath { get; set; }
 
         /// <summary>
         /// To persist session cookies (cookies without an expiry date or validity
         /// interval) by default when using the global cookie manager set this value to
         /// true. Session cookies are generally intended to be transient and most Web
-        /// browsers do not persist them. A |cache_path| value must also be specified to
-        /// enable this feature. Also configurable using the "persist-session-cookies"
-        /// command-line switch.
+        /// browsers do not persist them. A |cache_path| value must also be specified
+        /// to enable this feature. Also configurable using the
+        /// "persist-session-cookies" command-line switch. Can be overridden for
+        /// individual CefRequestContext instances via the
+        /// CefRequestContextSettings.persist_session_cookies value.
         /// </summary>
         public bool PersistSessionCookies { get; set; }
 
@@ -100,12 +134,6 @@
         /// "disable".
         /// </summary>
         public CefLogSeverity LogSeverity { get; set; }
-
-        /// <summary>
-        /// Enable DCHECK in release mode to ease debugging.  Also configurable using the
-        /// "enable-release-dcheck" command-line switch.
-        /// </summary>
-        public bool ReleaseDCheckEnabled { get; set; }
 
         /// <summary>
         /// Custom flags that will be used when initializing the V8 JavaScript engine.
@@ -186,32 +214,57 @@
         /// Enabling this setting can lead to potential security vulnerabilities like
         /// "man in the middle" attacks. Applications that load content from the
         /// internet should not enable this setting. Also configurable using the
-        /// "ignore-certificate-errors" command-line switch.
+        /// "ignore-certificate-errors" command-line switch. Can be overridden for
+        /// individual CefRequestContext instances via the
+        /// CefRequestContextSettings.ignore_certificate_errors value.
         /// </summary>
         public bool IgnoreCertificateErrors { get; set; }
+
+        /// <summary>
+        /// Opaque background color used for accelerated content. By default the
+        /// background color will be white. Only the RGB compontents of the specified
+        /// value will be used. The alpha component must greater than 0 to enable use
+        /// of the background color but will be otherwise ignored.
+        /// </summary>
+        public CefColor BackgroundColor { get; set; }
+
+        /// <summary>
+        /// Comma delimited ordered list of language codes without any whitespace that
+        /// will be used in the "Accept-Language" HTTP header. May be overridden on a
+        /// per-browser basis using the CefBrowserSettings.accept_language_list value.
+        /// If both values are empty then "en-US,en" will be used. Can be overridden
+        /// for individual CefRequestContext instances via the
+        /// CefRequestContextSettings.accept_language_list value.
+        /// </summary>
+        public string AcceptLanguageList { get; set; }
 
         internal cef_settings_t* ToNative()
         {
             var ptr = cef_settings_t.Alloc();
-            ptr->single_process = SingleProcess;
+            ptr->single_process = SingleProcess ? 1 : 0;
+            ptr->no_sandbox = NoSandbox ? 1 : 0;
             cef_string_t.Copy(BrowserSubprocessPath, &ptr->browser_subprocess_path);
-            ptr->multi_threaded_message_loop = MultiThreadedMessageLoop;
-            ptr->command_line_args_disabled = CommandLineArgsDisabled;
+            ptr->multi_threaded_message_loop = MultiThreadedMessageLoop ? 1 : 0;
+            ptr->windowless_rendering_enabled = WindowlessRenderingEnabled ? 1 : 0;
+            ptr->command_line_args_disabled = CommandLineArgsDisabled ? 1 : 0;
             cef_string_t.Copy(CachePath, &ptr->cache_path);
+            cef_string_t.Copy(UserDataPath, &ptr->user_data_path);
+            ptr->persist_session_cookies = PersistSessionCookies ? 1 : 0;
             cef_string_t.Copy(UserAgent, &ptr->user_agent);
             cef_string_t.Copy(ProductVersion, &ptr->product_version);
             cef_string_t.Copy(Locale, &ptr->locale);
             cef_string_t.Copy(LogFile, &ptr->log_file);
             ptr->log_severity = LogSeverity;
-            ptr->release_dcheck_enabled = ReleaseDCheckEnabled;
             cef_string_t.Copy(JavaScriptFlags, &ptr->javascript_flags);
             cef_string_t.Copy(ResourcesDirPath, &ptr->resources_dir_path);
             cef_string_t.Copy(LocalesDirPath, &ptr->locales_dir_path);
-            ptr->pack_loading_disabled = PackLoadingDisabled;
+            ptr->pack_loading_disabled = PackLoadingDisabled ? 1 : 0;
             ptr->remote_debugging_port = RemoteDebuggingPort;
             ptr->uncaught_exception_stack_size = UncaughtExceptionStackSize;
             ptr->context_safety_implementation = (int)ContextSafetyImplementation;
-            ptr->ignore_certificate_errors = IgnoreCertificateErrors;
+            ptr->ignore_certificate_errors = IgnoreCertificateErrors ? 1 : 0;
+            ptr->background_color = BackgroundColor.ToArgb();
+            cef_string_t.Copy(AcceptLanguageList, &ptr->accept_language_list);
             return ptr;
         }
 
@@ -219,6 +272,7 @@
         {
             libcef.string_clear(&ptr->browser_subprocess_path);
             libcef.string_clear(&ptr->cache_path);
+            libcef.string_clear(&ptr->user_data_path);
             libcef.string_clear(&ptr->user_agent);
             libcef.string_clear(&ptr->product_version);
             libcef.string_clear(&ptr->locale);
@@ -226,12 +280,13 @@
             libcef.string_clear(&ptr->javascript_flags);
             libcef.string_clear(&ptr->resources_dir_path);
             libcef.string_clear(&ptr->locales_dir_path);
+            libcef.string_clear(&ptr->accept_language_list);
         }
 
         internal static void Free(cef_settings_t* ptr)
         {
-            Clear((cef_settings_t*)ptr);
-            cef_settings_t.Free((cef_settings_t*)ptr);
+            Clear(ptr);
+            cef_settings_t.Free(ptr);
         }
     }
 }

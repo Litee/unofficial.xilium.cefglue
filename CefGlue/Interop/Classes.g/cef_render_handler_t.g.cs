@@ -21,13 +21,15 @@ namespace Xilium.CefGlue.Interop
         internal IntPtr _on_popup_size;
         internal IntPtr _on_paint;
         internal IntPtr _on_cursor_change;
+        internal IntPtr _start_dragging;
+        internal IntPtr _update_drag_cursor;
         internal IntPtr _on_scroll_offset_changed;
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG
         [SuppressUnmanagedCodeSecurity]
         #endif
-        internal delegate int add_ref_delegate(cef_render_handler_t* self);
+        internal delegate void add_ref_delegate(cef_render_handler_t* self);
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG
@@ -39,7 +41,7 @@ namespace Xilium.CefGlue.Interop
         #if !DEBUG
         [SuppressUnmanagedCodeSecurity]
         #endif
-        internal delegate int get_refct_delegate(cef_render_handler_t* self);
+        internal delegate int has_one_ref_delegate(cef_render_handler_t* self);
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG
@@ -87,13 +89,25 @@ namespace Xilium.CefGlue.Interop
         #if !DEBUG
         [SuppressUnmanagedCodeSecurity]
         #endif
-        internal delegate void on_cursor_change_delegate(cef_render_handler_t* self, cef_browser_t* browser, IntPtr cursor);
+        internal delegate void on_cursor_change_delegate(cef_render_handler_t* self, cef_browser_t* browser, IntPtr cursor, CefCursorType type, cef_cursor_info_t* custom_cursor_info);
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG
         [SuppressUnmanagedCodeSecurity]
         #endif
-        internal delegate void on_scroll_offset_changed_delegate(cef_render_handler_t* self, cef_browser_t* browser);
+        internal delegate int start_dragging_delegate(cef_render_handler_t* self, cef_browser_t* browser, cef_drag_data_t* drag_data, CefDragOperationsMask allowed_ops, int x, int y);
+        
+        [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
+        #if !DEBUG
+        [SuppressUnmanagedCodeSecurity]
+        #endif
+        internal delegate void update_drag_cursor_delegate(cef_render_handler_t* self, cef_browser_t* browser, CefDragOperationsMask operation);
+        
+        [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
+        #if !DEBUG
+        [SuppressUnmanagedCodeSecurity]
+        #endif
+        internal delegate void on_scroll_offset_changed_delegate(cef_render_handler_t* self, cef_browser_t* browser, double x, double y);
         
         private static int _sizeof;
         

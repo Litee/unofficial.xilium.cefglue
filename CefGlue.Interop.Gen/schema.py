@@ -54,6 +54,8 @@ c2cs_types = {
 
     'cef_base_t': 'cef_base_t',
 
+    'cef_color_t': 'uint',
+
     # structs
     'cef_urlparts_t': 'cef_urlparts_t',
     'cef_proxy_info_t': 'cef_proxy_info_t',
@@ -64,19 +66,31 @@ c2cs_types = {
     'cef_settings_t': 'cef_settings_t',
     'cef_key_event_t': 'cef_key_event_t',
     'cef_geoposition_t': 'cef_geoposition_t',
+    'cef_point_t': 'cef_point_t',
+    'cef_size_t': 'cef_size_t',
     'cef_rect_t': 'cef_rect_t',
     'cef_mouse_event_t': 'cef_mouse_event_t',
     'cef_screen_info_t': 'cef_screen_info_t',
+    'cef_page_range_t': 'cef_page_range_t',
+    'cef_cursor_info_t': 'cef_cursor_info_t',
+    'cef_request_context_settings_t': 'cef_request_context_settings_t',
+    'cef_draggable_region_t': 'cef_draggable_region_t',
+    'cef_pdf_print_settings_t': 'cef_pdf_print_settings_t',
 
     # platform dependend structs
     'cef_main_args_t': 'cef_main_args_t',
     'cef_window_info_t': 'cef_window_info_t',
 
-    'cef_text_input_context_t': 'IntPtr'
+    'cef_text_input_context_t': 'IntPtr',
+
+    'cef_color_model_t': 'CefColorModel',
+    'cef_duplex_mode_t': 'CefDuplexMode',
+
+    'cef_cursor_type_t': 'CefCursorType',
     }
 
 c2cs_platform_retval = {
-	# generates multiple delegates/methods if return value is platform specific
+    # generates multiple delegates/methods if return value is platform specific
     # 'cef_time_t': ['_other', '_mac']
     }
 
@@ -118,7 +132,14 @@ c2cs_enumtypes = {
     'cef_paint_element_type_t': 'CefPaintElementType',
     'cef_drag_operations_mask_t': 'CefDragOperationsMask',
     'cef_resource_type_t': 'CefResourceType',
-    'cef_transition_type_t': 'CefTransitionType'
+    'cef_transition_type_t': 'CefTransitionType',
+    'cef_uri_unescape_rule_t': 'CefUriUnescapeRules',
+    'cef_window_open_disposition_t': 'CefWindowOpenDisposition',
+    'cef_return_value_t': 'CefReturnValue',
+    'cef_json_parser_options_t': 'CefJsonParserOptions',
+    'cef_json_writer_options_t': 'CefJsonWriterOptions',
+    'cef_json_parser_error_t': 'CefJsonParserError',
+    'cef_pdf_print_margin_type_t': 'CefPdfPrintMarginType',
     }
 
 c2cs_structtypes = { }

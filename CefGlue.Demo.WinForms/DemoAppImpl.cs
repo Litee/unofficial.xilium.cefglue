@@ -19,6 +19,11 @@
 
         protected override void PlatformRunMessageLoop()
         {
+            if (!MultiThreadedMessageLoop)
+            {
+                Application.Idle += (s, e) => CefRuntime.DoMessageLoopWork();
+            }
+
             Application.Run();
         }
 
@@ -30,6 +35,11 @@
         protected override IMainView CreateMainView(MenuItem[] menuItems)
         {
             return new MainViewImpl(this, menuItems);
+        }
+
+        protected override void PlatformMessageBox(string message)
+        {
+            MessageBox.Show(message, "CefGlue Demo Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }
