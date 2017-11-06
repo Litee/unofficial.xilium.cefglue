@@ -70,5 +70,10 @@
         {
             return false;
         }
+
+        private void on_request_context_initialized(cef_request_context_handler_t* self, cef_request_context_t* request_context)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
