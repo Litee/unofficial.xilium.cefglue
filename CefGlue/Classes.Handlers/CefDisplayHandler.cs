@@ -150,7 +150,7 @@
 
         private int on_auto_resize(cef_display_handler_t* self, cef_browser_t* browser, cef_size_t* new_size)
         {
-            throw new NotImplementedException();
+            return 0;
         }
 
     }
