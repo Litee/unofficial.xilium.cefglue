@@ -147,5 +147,5 @@ classdef = {
     # 60-62
     'CefExtension': {'role': ROLE_PROXY},
     'CefGetExtensionResourceCallback': {'role': ROLE_PROXY},
-    'CefExtensionHandler': {'role': ROLE_HANDLER},
+    'CefExtensionHandler': {'role': ROLE_HANDLER, 'reversible': True},
 }

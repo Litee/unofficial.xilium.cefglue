@@ -223,6 +223,7 @@
     <Compile Include="Classes.Proxies\CefDownloadItem.cs" />
     <Compile Include="Classes.Proxies\CefDownloadItemCallback.cs" />
     <Compile Include="Classes.Proxies\CefDragData.cs" />
+    <Compile Include="Classes.Proxies\CefExtension.cs" />
     <Compile Include="Classes.Proxies\CefFileDialogCallback.cs" />
     <Compile Include="Classes.Proxies\CefFrame.cs" />
     <Compile Include="Classes.Proxies\CefGeolocationCallback.cs" />

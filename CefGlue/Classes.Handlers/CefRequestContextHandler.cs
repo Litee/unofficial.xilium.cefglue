@@ -73,6 +73,18 @@
 
         private void on_request_context_initialized(cef_request_context_handler_t* self, cef_request_context_t* request_context)
         {
+            CheckSelf(self);
+            var mRequestContext = CefRequestContext.FromNative(request_context);
+
+            OnRequestContextInitialized(mRequestContext);
+        }
+
+        /// <summary>
+        /// Called on the browser process UI thread immediately after the request
+        /// context has been initialized.
+        /// </summary>
+        protected virtual void OnRequestContextInitialized(CefRequestContext cefRequestContext)
+        {
         }
     }
 }

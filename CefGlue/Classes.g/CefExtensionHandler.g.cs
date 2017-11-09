@@ -19,6 +19,24 @@ namespace Xilium.CefGlue
         
         protected object SyncRoot { get { return this; } }
         
+        internal static CefExtensionHandler FromNativeOrNull(cef_extension_handler_t* ptr)
+        {
+            CefExtensionHandler value = null;
+            bool found;
+            lock (_roots)
+            {
+                found = _roots.TryGetValue((IntPtr)ptr, out value);
+            }
+            return found ? value : null;
+        }
+        
+        internal static CefExtensionHandler FromNative(cef_extension_handler_t* ptr)
+        {
+            var value = FromNativeOrNull(ptr);
+            if (value == null) throw ExceptionBuilder.ObjectNotFound();
+            return value;
+        }
+        
         private cef_extension_handler_t.add_ref_delegate _ds0;
         private cef_extension_handler_t.release_delegate _ds1;
         private cef_extension_handler_t.has_one_ref_delegate _ds2;

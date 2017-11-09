@@ -150,8 +150,21 @@
 
         private int on_auto_resize(cef_display_handler_t* self, cef_browser_t* browser, cef_size_t* new_size)
         {
-            return 0;
+            CheckSelf(self);
+
+            var mBrowser = CefBrowser.FromNative(browser);
+            return OnAutoResize(mBrowser, new CefSize(new_size->width, new_size->height)) ? 1 : 0;
         }
 
+        /// <summary>
+        /// Called when auto-resize is enabled via CefBrowserHost::SetAutoResizeEnabled
+        /// and the contents have auto-resized. |new_size| will be the desired size in
+        /// view coordinates. Return true if the resize was handled or false for
+        /// default handling.
+        /// </summary>
+        protected virtual bool OnAutoResize(CefBrowser browser, CefSize newSize)
+        {
+            return false;
+        }
     }
 }
