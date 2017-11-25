@@ -13,3 +13,7 @@
 * Download CEF binaries. For Windows x64 it will be http://opensource.spotify.com/cefbuilds/cef_binary_3.3202.1686.gd665578_windows64.tar.bz2
 * Unpack downloaded file and copy CEF binaries from `Release` and `Resources` folders into the folder with your app - e.g. into `C:\Users\John\Documents\unofficial.xilium.cefglue\CefGlue.Demo.WinForms\bin\Debug`
 * Launch your app
+
+# License
+
+This is a fork, so it follows Xilium.CefGlue license - namely: "This project is licensed under MIT License with portions of code licensed under New BSD License."
