@@ -2,17 +2,20 @@
 
 * CefGlue upgrades stopped for unknown reason at version 59, but many people must upgrade to modern versions of Chromium - e.g. to fix security issues. I have forked CefGlue and upgraded it to Chromium 62.
 * I am lazy, so I am running checks for Windows only. If there will be a demand I can start other setups as well.
-* Features added since v59 are implemented, but not tested:
+* Here are features added since v59. I have implemented new APIs, but did not test them much:
     * CefExtensions
     * CefDisplayHandler.on\_auto\_resize
     * CefRequestContextHandler.on\_request\_context_initialized
 
 # How to build
 
-* Build the VS project
-* Download CEF binaries. For Windows x64 it will be http://opensource.spotify.com/cefbuilds/cef_binary_3.3202.1686.gd665578_windows64.tar.bz2
-* Unpack downloaded file and copy CEF binaries from `Release` and `Resources` folders into the folder with your app - e.g. into `C:\Users\John\Documents\unofficial.xilium.cefglue\CefGlue.Demo.WinForms\bin\Debug`
-* Launch your app
+* Download CEF binaries from http://opensource.spotify.com/cefbuilds/index.html and unpack the archive
+* Copy `include` folder from CEF into `CefGlue.Interop.Gen\include`. Manually remove `cef_thread.h` and `cef_waitable_event.h` - these two files should be excluded.
+* Run `gen-cef3.cmd` within `CefGlue.Interop.Gen` folder. Note that you need Python 2.7 installed. In case you need to adjust path to Python binaries you can do it in `gen-cef3.cmd` file.
+* Build CefGlue binaries - e.g. by running `build-net40.cmd` in the root of the project
+* Copy CefGlue binaries into your app
+* Look again into unpacked CEF archive. Copy all files from `Release` and `Resources` folders into your app.
+* Launch your app. Tada!
 
 # License
 
