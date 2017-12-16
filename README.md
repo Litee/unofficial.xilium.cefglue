@@ -7,6 +7,10 @@
     * CefDisplayHandler.on\_auto\_resize
     * CefRequestContextHandler.on\_request\_context_initialized
 
+# Where to get binaries?
+
+I am publishing CefGlue core binaries for .NET 4.0 and .NET 4.5 here: https://www.nuget.org/packages/Litee.Unofficial.CefGlue/
+
 # How to build
 
 * Download CEF binaries from http://opensource.spotify.com/cefbuilds/index.html and unpack the archive
