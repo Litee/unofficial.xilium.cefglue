@@ -351,6 +351,7 @@ _simpletypes = {
     'void': ['void', ''],
     'void*': ['void*', 'NULL'],
     'int': ['int', '0'],
+    'uint16': ['uint16', '0'],
     'int32': ['int32', '0'],
     'uint32': ['uint32', '0'],
     'int64': ['int64', '0'],
