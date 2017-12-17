@@ -19,7 +19,6 @@ namespace Xilium.CefGlue.WPF
             Key.Tab, Key.Home, Key.End, Key.Left, Key.Right, Key.Up, Key.Down
         };
 
-        private bool _disposed;
         private bool _created;
 
         private Image _browserPageImage;
@@ -122,8 +121,6 @@ namespace Xilium.CefGlue.WPF
                     _browser = null;
                 }
             }
-
-            _disposed = true;
         }
 
         #endregion
