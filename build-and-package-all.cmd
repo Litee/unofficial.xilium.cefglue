@@ -8,4 +8,4 @@ del /Q CefGlue\bin\Release\*.*
 call build-net45.cmd
 copy CefGlue\bin\Release\*.* target\net45
 
-nuget pack Litee.Unofficial.CefGlue.nuspec -Version %1
+nuget pack Litee.Unofficial.CefGlue.nuspec -Version %APPVEYOR_BUILD_VERSION%
