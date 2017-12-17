@@ -1,18 +1,11 @@
 ﻿namespace Xilium.CefGlue.Demo
 {
     using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Drawing;
-    using System.Drawing.Drawing2D;
     using System.Windows.Forms;
-    using Xilium.CefGlue.Demo.Browser;
     using WebBrowser = Xilium.CefGlue.Demo.Browser.WebBrowser;
 
     public sealed class CefWebBrowser : Control
     {
-        private bool _handleCreated;
-
         private WebBrowser _core;
         private IntPtr _browserWindowHandle;
 
@@ -62,19 +55,13 @@
         {
             base.OnHandleCreated(e);
 
-            if (DesignMode)
-            {
-                // if (!_handleCreated) Paint += PaintInDesignMode;
-            }
-            else
+            if (!DesignMode)
             {
                 var windowInfo = CefWindowInfo.Create();
                 windowInfo.SetAsChild(Handle, new CefRectangle { X = 0, Y = 0, Width = Width, Height = Height });
 
                 _core.Create(windowInfo);
             }
-
-            _handleCreated = true;
         }
 
         protected override void Dispose(bool disposing)
