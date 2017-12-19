@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Litee.Unofficial.CefGlue</id>
-    <version>3.3202.1693-beta1</version>
+    <version>$version$</version>
     <title>Litee.Unofficial.CefGlue</title>
     <authors>Xilium CefGlue Team, Andrey "Litee" Lipatkin</authors>
     <owners>Andrey "Litee" Lipatkin</owners>
@@ -15,9 +15,7 @@
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System" targetFramework="" />
     </frameworkAssemblies>
-    <developmentDependency>true</developmentDependency>
   </metadata>
-  <!-- The convention for analyzers is to put language agnostic dlls in analyzers\portable50 and language specific analyzers in either analyzers\portable50\cs or analyzers\portable50\vb -->
   <files>
     <file src="CefGlue\bin\Release\v4.0\Xilium.CefGlue.dll" target="lib\net40"/>
     <file src="CefGlue\bin\Release\v4.0\Xilium.CefGlue.pdb" target="lib\net40"/>
