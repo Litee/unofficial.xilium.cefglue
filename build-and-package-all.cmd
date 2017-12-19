@@ -5,3 +5,4 @@ rem msbuild Xilium.CefGlue.sln /t:Build /p:Configuration=Release /p:TargetFramew
 rem msbuild Xilium.CefGlue.sln /t:Build /p:Configuration=Release /p:TargetFrameworkVersion=v4.5 /p:TargetFrameworkProfile= /p:Platform=x86
 
 nuget pack Litee.Unofficial.CefGlue.nuspec -Version %APPVEYOR_BUILD_VERSION%
+nuget pack Litee.Unofficial.CefGlue.WPF.nuspec -Version %APPVEYOR_BUILD_VERSION%
