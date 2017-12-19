@@ -1,0 +1,11 @@
+version: 3.3239.1705.{build}-alpha
+build_script:
+- cmd: build-and-package-all.cmd
+artifacts:
+- path: '*.nupkg'
+deploy:
+- provider: NuGet
+  api_key:
+    secure: CPX84oRRop5J6aUHaSfL2Tbgtr+W0ndCT6ZtD12rjzgwACWjt+YsREhsShs/7PuB
+  on:
+    branch: master
