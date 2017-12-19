@@ -17,7 +17,7 @@
     </frameworkAssemblies>
     <dependencies>
       <dependency id="NLog" version="2.0.1.2" />
-      <dependency id="Litee.Unofficial.CefGlue" version="$version$" />
+      <dependency id="Litee.Unofficial.CefGlue" version="[$version$]" />
     </dependencies>
   </metadata>
   <files>
