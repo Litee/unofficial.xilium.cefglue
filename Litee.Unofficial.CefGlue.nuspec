@@ -8,7 +8,7 @@
     <owners>Andrey "Litee" Lipatkin</owners>
     <projectUrl>https://github.com/Litee/unofficial.xilium.cefglue</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Xilium.CefGlue is a .NET/Mono binding for the Chromium Embedded Framework (CEF) by Marshall Greenblatt. Xilium.CefGlue looks abandoned, so I have created a fork and regularly upgrade it to the latest CEF versions.</description>
+    <description>Xilium.CefGlue is a .NET/Mono binding for the popular Chromium Embedded Framework (CEF). NOTE: Xilium.CefGlue project looks abandoned, so I have forked it to provide regular updates.</description>
     <releaseNotes></releaseNotes>
     <copyright>2017 Andrey Lipatkin</copyright>
     <tags>cef, chromium, browser, cefglue</tags>
