@@ -1,4 +1,4 @@
-version: 3.3239.1705.{build}-beta
+version: 3.3239.1709.{build}
 build_script:
 - cmd: build-and-package-all.cmd
 artifacts:
