@@ -17,10 +17,10 @@ I am publishing CefGlue core binaries for .NET 4.0 and .NET 4.5 here: https://ww
 
 * Download CEF binaries from http://opensource.spotify.com/cefbuilds/index.html and unpack the archive
 * Copy `include` folder from CEF into `CefGlue.Interop.Gen\include`. Manually remove `cef_thread.h` and `cef_waitable_event.h` - these two files should be excluded.
-* Run `gen-cef3.cmd` within `CefGlue.Interop.Gen` folder. Note that you need Python 2.7 installed. In case you need to adjust path to Python binaries you can do it in `gen-cef3.cmd` file.
-* Build CefGlue binaries - e.g. by running `build-net40.cmd` in the root of the project
+* Run `gen-cef3.cmd` within `CefGlue.Interop.Gen` folder. Note that you need Python 2.7 installed. In case you need to adjust path to Python binaries you can do it in `gen-cef3.cmd` file. This step will generate multiple C# files in `CefGlue` project.
+* Build CefGlue binaries - e.g. by running `build-net40.cmd` in the root of the project. If you upgraded to new version of CEF and you see an error you may need to add new generated files into `CefGlue` VS project.
 * Copy CefGlue binaries into your app
-* Look again into unpacked CEF archive. Copy all files from `Release` and `Resources` folders into your app.
+* Look again into CEF archive. Copy all files from `Release` and `Resources` folders into your app.
 * Launch your app. Tada!
 
 ## License
