@@ -1,6 +1,6 @@
 # Litee.Unofficial.CefGlue
 
-https://ci.appveyor.com/api/projects/status/ee8qvlr68hrjum64/branch/master?svg=true
+![Appveyor Status](https://ci.appveyor.com/api/projects/status/ee8qvlr68hrjum64/branch/master?svg=true)
 
 ## CefGlue upgrade to CEF/Chromium versions 62+
 
