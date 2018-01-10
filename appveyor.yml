@@ -1,4 +1,7 @@
-version: 3.3239.1709.{build}
+version: 3.3239.1723.{build}
+branches:
+  only:
+  - never-build-branch-automatically
 build_script:
 - cmd: build-and-package-all.cmd
 artifacts:
