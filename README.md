@@ -1,6 +1,8 @@
 # Litee.Unofficial.CefGlue
 
-## CefGlue upgrade to modern CEF/Chromium versions
+https://ci.appveyor.com/api/projects/status/ee8qvlr68hrjum64/branch/master?svg=true
+
+## CefGlue upgrade to CEF/Chromium versions 62+
 
 * CefGlue upgrades stopped for unknown reason at version 59, but many people must upgrade to modern versions of Chromium - e.g. to fix security issues. I have forked CefGlue and upgraded it to Chromium 62 and 63.
 * I am lazy, so I am running checks for Windows only. If there will be a demand I can start other setups as well.
