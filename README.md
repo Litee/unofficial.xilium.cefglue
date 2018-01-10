@@ -1,18 +1,18 @@
 # Litee.Unofficial.CefGlue
 
-![Appveyor Status](https://ci.appveyor.com/api/projects/status/ee8qvlr68hrjum64/branch/master?svg=true)
+![AppVeyor Status](https://ci.appveyor.com/api/projects/status/ee8qvlr68hrjum64/branch/master?svg=true)
 
-# Why forked?
+## Why fork?
 
 CefGlue upgrades stopped for unknown reason at version 59, but many people need upgrades - e.g. to fix security issues. I need the same for my project, so forked CefGlue and upgraded it to Chromium 62 and 63.
 
-# How stable is it?
+## How stable is it?
 
 * So far I have just added few new APIs (see the list below), so should be as stable as the original CefGlue
 * I implemented new APIs, but did not test them much - not required for my project
 * I am interested in Windows version only, so do not run any checks for Mono or Linux
 
-## What has changed in compare to the last *official* CefGlue v59
+## What has changed after the last *official* CefGlue v59?
 
 * v60-62
   * [CefExtension](https://github.com/chromiumembedded/cef/blob/master/include/cef_extension.h)
@@ -28,7 +28,7 @@ I am publishing CefGlue core binaries for .NET 4.0 and .NET 4.5 here: https://ww
 
 WPF wrapper is available here: https://www.nuget.org/packages/Litee.Unofficial.CefGlue.WPF/
 
-# How to use published NuGet packages in WPF app?
+## How to use published NuGet packages in WPF app?
 
 * Add `Litee.Unofficial.CefGlue.WPF` package into your app
 * Build your app
