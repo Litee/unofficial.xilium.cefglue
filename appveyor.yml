@@ -1,4 +1,4 @@
-version: 3.3239.1723.{build}-beta
+version: 3.3239.1723.{build}
 branches:
   only:
   - never-build-branch-automatically
