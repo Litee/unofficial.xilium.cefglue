@@ -2,7 +2,7 @@
 
 ![AppVeyor Status](https://ci.appveyor.com/api/projects/status/ee8qvlr68hrjum64/branch/master?svg=true)
 
-*Update: Original CefGlue maintainer has upgraded project up to v63. I will keep publishing NuGet packages for myself, but will switch to the original codebase.*
+**Update: Original CefGlue maintainer has upgraded project up to v63. I will keep publishing NuGet packages for myself, but will switch to the original codebase.**
 
 ## Why fork?
 
