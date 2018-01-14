@@ -2,6 +2,8 @@
 
 ![AppVeyor Status](https://ci.appveyor.com/api/projects/status/ee8qvlr68hrjum64/branch/master?svg=true)
 
+*Update: Original CefGlue maintainer has upgraded project up to v63. I will keep publishing NuGet packages for myself, but will switch to the original codebase.*
+
 ## Why fork?
 
 CefGlue upgrades stopped for unknown reason at version 59, but many people need upgrades - e.g. to fix security issues. I need the same for my project, so forked CefGlue and upgraded it to Chromium 62 and 63.
