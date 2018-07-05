@@ -56,8 +56,8 @@
             }
             finally
             {
-                m_out_stream?.Dispose();
-                m_in_stream?.Dispose();
+                if (m_out_stream != null) m_out_stream.Dispose();
+                if (m_in_stream != null) m_in_stream.Dispose();
             }
         }
 

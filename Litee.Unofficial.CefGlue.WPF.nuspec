@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Xilium.CefGlue is a .NET/Mono binding for the popular Chromium Embedded Framework (CEF). This package is a WPF binding around CefGlue core control from Litee.Unofficial.CefGlue package. NOTE: Xilium.CefGlue project looks abandoned, so I have forked it to provide regular updates.</description>
     <releaseNotes></releaseNotes>
-    <copyright>2017 Andrey Lipatkin</copyright>
+    <copyright>2017-2018 Andrey Lipatkin</copyright>
     <tags>cef, chromium, browser, cefglue</tags>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System" targetFramework="" />

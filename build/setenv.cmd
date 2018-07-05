@@ -14,5 +14,6 @@ set path=%ProgramFiles(x86)%\MSBuild\14.0\Bin;%ProgramFiles%\MSBuild\14.0\Bin;%W
 goto :eof
 
 :x64
-set path=%ProgramFiles(x86)%\MSBuild\14.0\Bin;%WINDIR%\Microsoft.NET\Framework64\v4.0.30319;%PATH%
+rem set path=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin;%WINDIR%\Microsoft.NET\Framework64\v4.0.30319;%PATH%
+set path=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin
 goto :eof

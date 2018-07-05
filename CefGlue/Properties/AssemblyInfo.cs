@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Xilium CefGlue")]
 [assembly: AssemblyDescription("Xilium.CefGlue is a .NET/Mono binding for The Chromium Embedded Framework (CEF) by Marshall A. Greenblatt.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Xilium Project")]
+[assembly: AssemblyCompany("Xilium")]
 [assembly: AssemblyProduct("Xilium CefGlue")]
-[assembly: AssemblyCopyright("Copyright © Xilium Project 2016")]
+[assembly: AssemblyCopyright("Copyright © Xilium 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,6 +32,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("63.0.0.0")]
-[assembly: AssemblyFileVersion("63.0.0.0")]
-[assembly: AssemblyInformationalVersion("63.0.0")]
+[assembly: AssemblyVersion("66.0.1.0")]
+[assembly: AssemblyFileVersion("66.0.1.0")]
+[assembly: AssemblyInformationalVersion("66.0.1")]
